@@ -1,0 +1,346 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    <title>TANKS</title>
+</head>
+<body>
+    
+    <canvas id="canvas" width="320" height="320" style="border: 16px solid black;">Y U SUCK?</canvas>
+    
+    <script type="text/javascript">
+        
+        var can = document.getElementById('canvas');
+        var ctx = can.getContext("2d");
+        
+        var i, cl, pl, en, key, blocks = [], bombs = [];
+        
+        key = 0;
+        
+        pl = {
+            x: 8,
+            y: 2,
+            mv: 0,
+            bm: 0
+        };
+        
+        en = {
+            x: 2,
+            y: 9,
+            mv: 0,
+            bm: 0
+        };
+        
+        cl = {};
+        
+        for(i=0; i<10; i++) {
+            
+            var b = {
+                x: Math.floor(Math.random() * 10),
+                y: Math.floor(Math.random() * 9)
+            };
+            
+            if(b.x == pl.x && b.y == pl.y) {
+                b.x--;
+            }
+            
+            blocks.push(b);
+            
+        }
+        
+        var inter = setInterval(function () {
+            
+            if(pl.mv > 0) { pl.mv--; }
+            if(pl.bm > 0) { pl.bm--; }
+            
+            if(en.mv > 0) { en.mv--; }
+            if(en.bm > 0) { en.bm--; }
+            
+            for(i=0; i<bombs.length; i++) {
+                var b = bombs[i];
+                if(b.mv == 1) {
+                    b.x += b.dx;
+                    b.y += b.dy;
+                    b.hp--;
+                    var collatthis = getAtXY(b.x, b.y);
+                    if(b.hp <= 0 || collatthis) {
+                        
+                        if(collatthis) {
+                            b.x -= b.dx;
+                            b.y -= b.dy;
+                        }
+                        
+                        var tk = [];
+                        
+                        for(var x=-1;x<=1;x++) { for(var y=-1;y<=1;y++) {
+                            var it = getAtXY(b.x + x, b.y + y);
+                            if(it && (it.type == "enemy" || it.type == "player")) {
+                                tk.push(it);
+                            }
+                        }}
+                        
+                        if(tk.length == 2) {
+                            alert("TIE");
+                            clearInterval(inter);
+                        } else if(tk[0] && tk[0].type == "enemy") {
+                            alert("You won, winner!");
+                            clearInterval(inter);
+                        } else if(tk[0] && tk[0].type == "player") {
+                            alert("You lost, bitch!");
+                            clearInterval(inter);
+                        }
+                        
+                        b.hp = 0;
+                        
+                        continue;
+                    }
+                } else {
+                    b.mv = 1;
+                }
+            }
+            
+            var newbombs = [];
+            for(i=0; i<bombs.length; i++) {
+                if(bombs[i].hp > 0) { newbombs.push(bombs[i]); }
+            }
+            bombs = newbombs;
+            
+            
+            
+            
+            
+            
+            
+            
+            // Left
+            if(key == 37) {
+                if(pl.mv < 1 && !getAtXY(pl.x-1, pl.y)) {
+                    pl.x -= 1;
+                    pl.mv += 3;
+                }
+            }
+            
+            // Up
+            if(key == 38 && !getAtXY(pl.x, pl.y-1)) {
+                if(pl.mv < 1) {
+                    pl.y -= 1;
+                    pl.mv += 3;
+                }
+            }
+            
+            // Right
+            if(key == 39 && !getAtXY(pl.x+1, pl.y)) {
+                if(pl.mv < 1) {
+                    pl.x += 1;
+                    pl.mv += 3;
+                }
+            }
+            
+            //Down
+            if (key == 40 && !getAtXY(pl.x, pl.y+1)) {
+                if(pl.mv < 1) {
+                    pl.y += 1;
+                    pl.mv += 3;
+                }
+            }
+            
+            //W
+            if (key == 87) {
+                if(pl.bm < 1) {
+                    pl.bm += 6;
+                    bombs.push({
+                        x: pl.x,
+                        y: pl.y,
+                        dx: 0,
+                        dy: -1,
+                        mv: 0,
+                        hp: 5
+                    });
+                }
+            }
+            
+            //S
+            if (key == 83) {
+                if(pl.bm < 1) {
+                    pl.bm += 6;
+                    bombs.push({
+                        x: pl.x,
+                        y: pl.y,
+                        dx: 0,
+                        dy: 1,
+                        mv: 0,
+                        hp: 5
+                    });
+                }
+            }
+            
+            //A
+            if (key == 65) {
+                if(pl.bm < 1) {
+                    pl.bm += 6;
+                    bombs.push({
+                        x: pl.x,
+                        y: pl.y,
+                        dx: -1,
+                        dy: 0,
+                        mv: 0,
+                        hp: 5
+                    });
+                }
+            }
+            
+            //D
+            if (key == 68) {
+                if(pl.bm < 1) {
+                    pl.bm += 6;
+                    bombs.push({
+                        x: pl.x,
+                        y: pl.y,
+                        dx: 1,
+                        dy: 0,
+                        mv: 0,
+                        hp: 5
+                    });
+                }
+            }
+            
+            key = 0;
+            
+            
+            
+            
+            
+            
+            /* AI */
+            (function () {
+                
+                var dx = pl.x - en.x;
+                var dy = pl.y - en.y;
+                var dis = Math.sqrt(dx*dx + dy*dy);
+                
+                var mx = 0, my = 0, mb = 99;
+                
+                if(dis > 5) {
+                    if(Math.abs(dx) < Math.abs(dy)) {
+                        my = (dy<0?-1:1);
+                    } else {
+                        mx = (dx<0?-1:1);
+                    }
+                } else if(dis > 1) {
+                    my = (dy<0?-1:1);
+                }
+                
+                if(dis > 1 && dis < 5 && (Math.abs(dx) < 2 || Math.abs(dy) < 2)) {
+                    if(Math.abs(dx) < Math.abs(dy)) {
+                        mb = (dy<0?0:2);
+                    } else {
+                        mb = (dx<0?3:1);
+                    }
+                }
+                
+                console.log(dis, dx, dy, mx, my, mb);
+                if(mb != 99 && !willILose(mb)) {
+                    if(en.bm < 1) {
+                        en.bm += 6;
+                        bombs.push({
+                            x: en.x,
+                            y: en.y,
+                            dx: (mb == 1)?1:((mb == 3)?-1:0),
+                            dy: (mb == 2)?1:((mb == 0)?-1:0),
+                            mv: 0,
+                            hp: 5
+                        });
+                    }
+                }
+                
+                if(mx + my != 0) {
+                    if(getAtXY(en.x + mx, en.y + my)) {
+                        if(Math.random() < .5) { my = 0; mx = [-1,1][Math.floor(Math.random() * 2)]; }
+                        else { mx = 0; my = [-1,1][Math.floor(Math.random() * 2)]; }
+                    }
+                    if(en.mv < 1 && !getAtXY(en.x + mx, en.y + my)) {
+                        en.mv += 6;
+                        en.x += mx;
+                        en.y += my;
+                    }
+                }
+                
+                
+            })();
+            /* End AI */
+            
+            draw();
+            
+        }, 1000/6);
+        
+        
+        
+        
+        document.onkeydown = function (e) {
+            key = e.keyCode;
+        };
+        
+        function draw() {
+            
+            ctx.clearRect(0, 0, 501, 501);
+            
+            ctx.beginPath();
+            ctx.rect(pl.x * 32, pl.y * 32, 32, 32);
+            ctx.fillStyle = "green";
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.rect(en.x * 32, en.y * 32, 32, 32);
+            ctx.fillStyle = "red";
+            ctx.fill();
+            
+            for(i=0; i<blocks.length; i++) {
+                ctx.beginPath();
+                ctx.rect(blocks[i].x * 32, blocks[i].y * 32, 32, 32);
+                ctx.fillStyle = "black";
+                ctx.fill();
+            }
+            
+            for(i=0; i<bombs.length; i++) {
+                ctx.beginPath();
+                ctx.rect(bombs[i].x * 32, bombs[i].y * 32, 32, 32);
+                ctx.fillStyle = "orange";
+                ctx.fill();
+            }
+            
+        };
+        
+        function getAtXY(x, y) {
+            
+            if(pl.x == x && pl.y == y) { pl.type = "player"; return pl; }
+            if(en.x == x && en.y == y) { en.type = "enemy"; return en; }
+            
+            for(i=0; i<blocks.length; i++) {
+                if(blocks[i].x == x && blocks[i].y == y) { blocks[i].type = "block"; return blocks[i]; }
+            }
+            
+            return null;
+        }
+        
+        function willILose(dir) {
+            var i, dx = 0, dy = 0, col;
+            for(i=0;i<4;i++) {
+                
+                dy += (dir == 0)?-1:0;
+                dx += (dir == 1)?1:0;
+                dy += (dir == 2)?1:0;
+                dx += (dir == 3)?-1:0;
+                
+                col = getAtXY(en.x + dx, en.y + dy);
+                console.log(dx, dy, col);
+                if(col && col.type == "block") {
+                    return true;
+                }
+                
+            }
+            return false;
+        }
+        
+    </script>
+    
+</body>
+</html>

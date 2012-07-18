@@ -1,0 +1,84 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    
+</head>
+<body>
+    
+    <canvas id="canvas" width="501" height="501">Y U SUCK?</canvas>
+    
+    <script type="text/javascript">
+        
+        var can = document.getElementById('canvas');
+        var ctx = can.getContext("2d");
+        
+        var i, points = [];
+        
+        for(i=0; i<100; i++) {
+            points.push({
+                x: Math.floor(Math.random() * 500),
+                y: Math.floor(Math.random() * 500)
+            });
+        }
+        
+        var gs = 2, partitions;
+        
+        while(true) {
+            console.log(gs);
+            partitions = [];
+            
+            for(i=0; i<gs*gs; i++) {
+                partitions.push([]);
+            }
+            
+            var c = false;
+            
+            for(i=0; i<points.length; i++) {
+                var p = points[i];
+                partitions[gs * Math.floor(p.y / (500/gs)) + Math.floor(p.x / (500/gs))].push(p);
+                if(partitions[gs * Math.floor(p.y / (500/gs)) + Math.floor(p.x / (500/gs))].length > 10) {
+                    console.log("KAOOOS");
+                    c = true;
+                }
+            }
+            
+            draw();
+            
+            console.log(partitions);
+            
+            if(c) {
+                gs++;
+                continue;
+            }
+            
+            break;
+        }
+        
+        function draw() {
+            
+            ctx.clearRect(0, 0, 501, 501);
+            
+            for(i=0; i<=gs; i++) {
+                ctx.beginPath();
+                ctx.rect((500/gs) * i, 0, 1, 500);
+                ctx.fillStyle = "green";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.rect(0, (500/gs) * i, 500, 1);
+                ctx.fillStyle = "green";
+                ctx.fill();
+            }
+            
+            for(i=0; i<points.length; i++) {
+                ctx.beginPath();
+                ctx.rect(points[i].x - .0, points[i].y - .0, 1, 1);
+                ctx.fillStyle = "black";
+                ctx.fill();
+            }
+            
+        }
+        
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    
+</head>
+<body>
+    
+    <div class="linus">
+        <ul>
+            <li class="test">hej</li>
+            <li class="linus">hoj</li>
+            <li class="test">haj</li>
+            <li class="linus test">Always</li>
+        </ul>
+    </div>
+    
+    <script type="text/javascript">
+        
+        function a (dom, className) {
+            
+            var r = [];
+            var x = new RegExp('(^| )' + className + '( |$)');
+            
+            var b = function (c) {
+                
+                if(c.className && x.exec(c.className)) {
+                    r.push(c);
+                }
+                
+                for(var i=0; i<c.childNodes.length; i+=1) {
+                    b(c.childNodes[i]);
+                }
+                
+            };
+            
+            b(dom);
+            
+            return r;
+        }
+        
+    </script>
+    
+</body>
+</html>

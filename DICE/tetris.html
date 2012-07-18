@@ -1,0 +1,295 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    
+</head>
+<body>
+    
+    <canvas id="canvas" style="border: 4px solid black;" width="64" height="96">Y U SUCK?</canvas>
+    
+    <p id="score">Score: 0</p>
+    
+    <script type="text/javascript">
+        
+        var score = 0;
+        
+        var can = document.getElementById('canvas');
+        var ctx = can.getContext("2d");
+        
+        var block = null;
+        var blocks = [];
+        
+        /*var*/ newBlock = function () {
+            
+            block = {
+                type: ['line','block','pixel'][Math.floor(Math.random() * 2)],
+                x: 4,
+                y: -3,
+                c: ['red','green','blue','pink'][Math.floor(Math.random() * 4)],
+                int: setInterval(function () {
+                    
+                    if(collBlock(block)) {
+                        pixelBlock(block);
+                        clearInterval(block.int);
+                        block = null;
+                        setTimeout(newBlock, 750 / 4);
+                        return ;
+                    }
+                    
+                    block.y += 1;
+                    
+                    removeBlocks();
+                    
+                }, 750 / 4)
+            };
+            
+            if(collBlock(block)) {
+                alert("You lose");
+                clearInterval(block.int);
+                block = null;
+            }
+            
+        };
+        
+        /*var*/ drawBlock = function (b) {
+            
+            ctx.beginPath();
+            
+            if(b.type == 'line') {
+                ctx.rect(b.x * 8, (b.y - 2) * 8, 8, 32);
+            }
+            
+            if(b.type == 'block') {
+                ctx.rect((b.x - 1) * 8, (b.y - 1) * 8, 16, 16);
+            }
+            
+            if(b.type == 'pixel') {
+                ctx.rect(b.x * 8, b.y * 8, 8, 8);
+            }
+            
+            ctx.fillStyle = b.c;
+            ctx.fill();
+            
+        };
+        
+        /*var*/ collBlock = function (b) {
+            
+            var i;
+            
+            if(b.type == 'line') {
+                if(b.y == 10) { return true; }
+                for(i=0; i<blocks.length; i++) {
+                    if(b.x == blocks[i].x && b.y + 2 == blocks[i].y) {
+                        return true;
+                    }
+                }
+            }
+            
+            if(b.type == 'block') {
+                if(b.y == 11) { return true; }
+                for(i=0; i<blocks.length; i++) {
+                    if((b.x == blocks[i].x || b.x - 1 == blocks[i].x) && b.y + 1 == blocks[i].y) {
+                        return true;
+                    }
+                }
+            }
+            
+            if(b.y == 12) {
+                return true;
+            }
+            
+            return false;
+        };
+        
+        /*var*/ pixelBlock = function (b) {
+            
+            if(b.type == 'line') {
+                blocks.push({
+                    type: 'pixel',
+                    x: b.x,
+                    y: b.y - 2,
+                    c: b.c
+                });
+                blocks.push({
+                    type: 'pixel',
+                    x: b.x,
+                    y: b.y - 1,
+                    c: b.c
+                });
+                blocks.push({
+                    type: 'pixel',
+                    x: b.x,
+                    y: b.y,
+                    c: b.c
+                });
+                blocks.push({
+                    type: 'pixel',
+                    x: b.x,
+                    y: b.y + 1,
+                    c: b.c
+                });
+            }
+            
+            if(b.type == 'block') {
+                blocks.push({
+                    type: 'pixel',
+                    x: b.x - 1,
+                    y: b.y - 1,
+                    c: b.c
+                });
+                blocks.push({
+                    type: 'pixel',
+                    x: b.x - 1,
+                    y: b.y,
+                    c: b.c
+                });
+                blocks.push({
+                    type: 'pixel',
+                    x: b.x,
+                    y: b.y - 1,
+                    c: b.c
+                });
+                blocks.push({
+                    type: 'pixel',
+                    x: b.x,
+                    y: b.y,
+                    c: b.c
+                });
+            }
+            
+        };
+        
+        /*var*/ function removeBlocks() {
+            
+            var y, i, rows = [];
+            
+            for(y=0; y<12; y++) { rows.push(0); }
+            
+            for(i=0; i<blocks.length; i++) {
+                
+                y = blocks[i].y;
+                
+                if(blocks[i].type == 'line') {
+                    rows[y - 2] += 1;
+                    rows[y - 1] += 1;
+                    rows[y + 0] += 1;
+                    rows[y + 1] += 1;
+                }
+                
+                if(blocks[i].type == 'block') {
+                    rows[y - 2] += 0;
+                    rows[y - 1] += 2;
+                    rows[y + 0] += 2;
+                    rows[y + 1] += 0;
+                }
+                
+                if(blocks[i].type == 'pixel') {
+                    rows[y + 0] += 1;
+                }
+                
+            }
+            
+            console.log(rows);
+            
+            for(y=0; y<rows.length; y++) {
+                if(rows[y] == 8) {
+                    
+                    var nb = [];
+                    
+                    for(i=0; i<blocks.length; i++) {
+                        if(blocks[i].y < y) {
+                            blocks[i].y ++;
+                            nb.push(blocks[i]);
+                        } else if(blocks[i].y != y) {
+                            nb.push(blocks[i]);
+                        }
+                    }
+                    
+                    blocks = nb;
+                    
+                    document.getElementById('score').innerHTML = "Score: " + (++score);
+                    
+                }
+            }
+            
+        };
+        
+        setInterval(function () {
+            
+            ctx.clearRect(0, 0, 512, 320);
+            
+            if(block) {
+                drawBlock(block);
+            }
+            
+            for(var i=0; i<blocks.length; i+=1) {
+                drawBlock(blocks[i]);
+            }
+            
+            
+            
+            
+            /*
+            
+            ctx.beginPath();
+            ctx.arc(eny.x, eny.y, 8, 0, 2*Math.PI, true);
+            ctx.fillStyle = "red";
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(ply.x, ply.y, 8, 0, 2*Math.PI, true);
+            ctx.fillStyle = "green";
+            ctx.fill();
+            
+            var win = false;
+            
+            for(var i=0; i<mis.length; i++) {
+                
+                mis[i].y += mis[i].dy;
+                
+                ctx.beginPath();
+                ctx.arc(mis[i].x, mis[i].y, 6, 0, 2*Math.PI, true);
+                ctx.fillStyle = "yellow";
+                ctx.fill();
+                
+                if(
+                   mis[i].y >= eny.y - 8 && mis[i].y <= eny.y + 8 &&
+                   mis[i].x >= eny.x - 8 - 6 && mis[i].x <= eny.x + 8 + 6
+                ) {
+                    win = true;
+                }
+                
+            }
+            
+            if(win) {
+                eny.y = 1024;
+                alert("You win");
+            }
+            */
+        }, 1000/30);
+        
+        document.onkeydown = function (e) {
+            
+            // Left
+            if(e.keyCode == 37) {
+                block.x -= 1;
+            }
+            
+            // Rotate
+            if(e.keyCode == 38) {
+                
+            }
+            
+            // Right
+            if(e.keyCode == 39) {
+                block.x += 1;
+            }
+            
+        };
+        
+        newBlock();
+        
+    </script>
+    
+</body>
+</html>

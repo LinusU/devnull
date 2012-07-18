@@ -1,0 +1,110 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    <script type="text/javascript" src="socket.io/socket.io.js"></script>
+    <style type="text/css">
+        
+        h1 {
+            clear: both;
+        }
+        
+        div {
+            float: left;
+            padding: 12px;
+        }
+        
+        div.selected {
+            background: yellow;
+        }
+        
+        canvas {
+            border: 4px solid black;
+            background: white;
+        }
+        
+        p {
+            text-align: center;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <h1></h1>
+    
+    <div>
+        <canvas id="canvas0" width="64" height="96">Y U SUCK?</canvas>
+        <p id="score0">Score: 0</p>
+        <button id="btn0" onclick="join(0);">Join!</button>
+    </div>
+    
+    <div>
+        <canvas id="canvas1" width="64" height="96">Y U SUCK?</canvas>
+        <p id="score1">Score: 0</p>
+        <button id="btn1" onclick="join(1);">Join!</button>
+    </div>
+    
+    <script type="text/javascript">
+        
+        window.socket = io.connect(window.location.toString());
+        
+        function join(id) {
+            
+            document.getElementById('btn0').parentNode.removeChild(document.getElementById('btn0'));
+            document.getElementById('btn1').parentNode.removeChild(document.getElementById('btn1'));
+            
+            //window.t = [t0, t1][id];
+            
+            document.getElementById('canvas' + id).parentNode.className = "selected";
+            
+            window.myID = id;
+            
+            socket.emit('join', { id: id });
+            
+        };
+        
+        socket.on('js', function (data) {
+            
+            window.ctx = document.getElementById('canvas' + data.id).getContext('2d');
+            
+            eval(data.code);
+            
+        });
+        
+        /*
+        window.t0 = new Tetris(0);
+        window.t1 = new Tetris(1);
+        
+        window.t = null;
+        */
+        document.onkeydown = function (e) {
+            
+            if(window.t) {
+                window.t.event(e);
+            }
+            
+            if(window.myID !== undefined) {
+                socket.emit('keydown', {
+                    id: window.myID,
+                    event: {
+                        keyCode: e.keyCode
+                    }
+                });
+            }
+            
+        };
+        /*
+        setInterval(function () {
+            t0.draw();
+            t1.draw();
+        }, 1000/30);
+        */
+        /*
+        t0.newBlock();
+        t1.newBlock();
+        */
+        
+    </script>
+    
+</body>
+</html>

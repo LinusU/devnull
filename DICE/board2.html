@@ -1,0 +1,156 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    
+</head>
+<body>
+    
+    <canvas id="canvas" width="501" height="501">Y U SUCK?</canvas>
+    
+    <script type="text/javascript">
+        
+        var can = document.getElementById('canvas');
+        var ctx = can.getContext("2d");
+        
+        var i;
+        
+        var parent = {
+            x: 0,
+            y: 0,
+            w: 500,
+            h: 500,
+            points: [], 
+            childs: []
+        };
+        
+        for(i=0; i<100; i++) {
+            parent.points.push({
+                x: Math.floor(Math.random() * 500),
+                y: Math.floor(Math.random() * 500)
+            });
+        }
+        
+        function partitionNode(node) {
+            
+            if(node.points.length <= 10) {
+                return ;
+            }
+            
+            node.childs = [
+                { x: node.x, y: node.y, w: node.w/2, h: node.h/2, points: [], childs: [] },
+                { x: node.x + node.w/2, y: node.y, w: node.w/2, h: node.h/2, points: [], childs: [] },
+                { x: node.x, y: node.y + node.h/2, w: node.w/2, h: node.h/2, points: [], childs: [] },
+                { x: node.x + node.w/2, y: node.y + node.h/2, w: node.w/2, h: node.h/2, points: [], childs: [] }
+            ];
+            
+            for(i=0; i<node.points.length; i++) {
+                
+                var p = node.points[i];
+                
+                node.childs[(function () {
+                    return (
+                        ((p.y < node.y + (node.h / 2))?0:2) +
+                        ((p.x < node.x + (node.w / 2))?0:1)
+                    );
+                })()].points.push(p);
+                
+            }
+            
+            node.points = [];
+            
+            partitionNode(node.childs[0]);
+            partitionNode(node.childs[1]);
+            partitionNode(node.childs[2]);
+            partitionNode(node.childs[3]);
+            
+        };
+        
+        ctx.clearRect(0, 0, 501, 501);
+        
+        partitionNode(parent);
+        drawNode(parent);
+        console.log(parent);
+        
+        function drawNode(node) {
+            
+            ctx.beginPath();
+            ctx.rect(node.x, node.y, node.w, node.h);
+            ctx.strokeStyle = "green";
+            ctx.stroke();
+            
+            for(i=0; i<node.points.length; i++) {
+                ctx.beginPath();
+                ctx.rect(node.points[i].x - .0, node.points[i].y - .0, 1, 1);
+                ctx.fillStyle = "black";
+                ctx.fill();
+            }
+            
+            for(i=0; i<node.childs.length; i++) {
+                //drawNode(node.childs[i]);
+            }
+            
+        };
+        
+        
+        /*
+        
+        
+        while(true) {
+            console.log(gs);
+            partitions = [];
+            
+            for(i=0; i<gs*gs; i++) {
+                partitions.push([]);
+            }
+            
+            var c = false;
+            
+            for(i=0; i<points.length; i++) {
+                var p = points[i];
+                partitions[gs * Math.floor(p.y / (500/gs)) + Math.floor(p.x / (500/gs))].push(p);
+                if(partitions[gs * Math.floor(p.y / (500/gs)) + Math.floor(p.x / (500/gs))].length > 10) {
+                    console.log("KAOOOS");
+                    c = true;
+                }
+            }
+            
+            draw();
+            
+            console.log(partitions);
+            
+            if(c) {
+                gs++;
+                continue;
+            }
+            
+            break;
+        }
+        
+        function draw() {
+            
+            ctx.clearRect(0, 0, 501, 501);
+            
+            for(i=0; i<=gs; i++) {
+                ctx.beginPath();
+                ctx.rect((500/gs) * i, 0, 1, 500);
+                ctx.fillStyle = "green";
+                ctx.fill();
+                ctx.beginPath();
+                ctx.rect(0, (500/gs) * i, 500, 1);
+                ctx.fillStyle = "green";
+                ctx.fill();
+            }
+            
+            for(i=0; i<points.length; i++) {
+                ctx.beginPath();
+                ctx.rect(points[i].x - .0, points[i].y - .0, 1, 1);
+                ctx.fillStyle = "black";
+                ctx.fill();
+            }
+            
+        }
+        */
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,70 @@
+<html>
+<head>
+    
+</head>
+<body>
+    
+    <canvas width="200" height="200" id="c"></canvas>
+    
+    <script type="text/javascript">
+        
+        var ball1 = { x: 50, y: 50, r: 16, dy: 4, dr: 0};
+        //var ball2 = { x: 150, y: 50, r: 16, dy: -4};
+        
+        var $c = document.getElementById('c');
+        var ctx = $c.getContext('2d');
+        
+        var draw = function () {
+            
+            ctx.clearRect(0, 0, 200, 200);
+            ctx.beginPath();
+            //ctx.fillStyle="#0000FF";
+            ctx.arc(ball1.x, ball1.y, ball1.r, 0, Math.PI*2, true);
+            //ctx.arc(ball2.x, ball2.y, ball2.r, 0, Math.PI*2, true);
+            
+            ctx.closePath();
+            //ctx.fill();
+            ctx.stroke();
+            
+            /*
+            ball1.y += ball1.dy;
+            
+            if(ball1.y < ball1.r) {
+                ball1.y = ball1.r;
+                ball1.dy *= -1;
+            }
+            
+            if(ball1.y > 200-ball1.r) {
+                ball1.y = 200-ball1.r;
+                ball1.dy *= -1;
+            }
+            
+            ball2.y += ball2.dy;
+            
+            if(ball2.y < ball2.r) {
+                ball2.y = ball2.r;
+                ball2.dy *= -1;
+            }
+            
+            if(ball2.y > 200-ball2.r) {
+                ball2.y = 200-ball2.r;
+                ball2.dy *= -1;
+            }
+            */
+            
+            ball1.r += ball1.dr;
+            
+        };
+        
+        $c.onclick = function () {
+            ball1.dr = 1;
+        };
+        
+        setInterval(draw, 1000/30);
+        
+        
+        
+    </script>
+    
+</body>
+</html>

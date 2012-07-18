@@ -1,0 +1,89 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    
+</head>
+<body>
+    
+    <canvas id="canvas" width="512" height="320">Y U SUCK?</canvas>
+    
+    <script type="text/javascript">
+        
+        var can = document.getElementById('canvas');
+        var ctx = can.getContext("2d");
+        
+        var ply = { x: 48, y: 256, dx: 8 };
+        var eny = { x: 96, y: 32, dx: -8 };
+        
+        var mis = [];
+        
+        setInterval(function () {
+            
+            eny.x += eny.dx;
+            
+            if(eny.x < 0) { eny.x = -eny.x; eny.dx *= -1; }
+            if(eny.x > 512) { eny.x = 512; eny.dx *= -1; }
+            
+            
+            ctx.clearRect(0, 0, 512, 320);
+            
+            ctx.beginPath();
+            ctx.arc(eny.x, eny.y, 8, 0, 2*Math.PI, true);
+            ctx.fillStyle = "red";
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(ply.x, ply.y, 8, 0, 2*Math.PI, true);
+            ctx.fillStyle = "green";
+            ctx.fill();
+            
+            var win = false;
+            
+            for(var i=0; i<mis.length; i++) {
+                
+                mis[i].y += mis[i].dy;
+                
+                ctx.beginPath();
+                ctx.arc(mis[i].x, mis[i].y, 6, 0, 2*Math.PI, true);
+                ctx.fillStyle = "yellow";
+                ctx.fill();
+                
+                if(
+                   mis[i].y >= eny.y - 8 && mis[i].y <= eny.y + 8 &&
+                   mis[i].x >= eny.x - 8 - 6 && mis[i].x <= eny.x + 8 + 6
+                ) {
+                    win = true;
+                }
+                
+            }
+            
+            if(win) {
+                eny.y = 1024;
+                alert("You win");
+            }
+            
+        }, 1000/30);
+        
+        document.onkeydown = function (e) {
+            
+            // Left
+            if(e.keyCode == 37) {
+                ply.x -= ply.dx;
+            }
+            
+            // Shoot
+            if(e.keyCode == 38) {
+                mis.push({ x: ply.x, y: ply.y, dy: -8 });
+            }
+            
+            // Right
+            if(e.keyCode == 39) {
+                ply.x += ply.dx;
+            }
+            
+        };
+        
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    <script type="text/javascript" src="socket.io/socket.io.js"></script>
+    <style type="text/css">
+        
+        section {
+            width: 960px;
+            height: 480px;
+            position: relative;
+            margin: 12px auto;
+        }
+        
+        h1, div, input {
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            border: 1px solid black;
+            margin: 0;
+            padding: 0;
+        }
+        
+        h1 {
+            top: 0px;
+            height: 48px;
+            text-align: center;
+        }
+        
+        div {
+            top: 48px;
+            bottom: 24px;
+            overflow: scroll;
+            overflow-x: hidden;
+        }
+        
+        input {
+            bottom: 0px;
+            height: 24px;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <section>
+        
+        <h1>Epic MUD</h1>
+        
+        <div>
+            
+        </div>
+        
+        <form onsubmit="return send();"><input id="text" type="text" /><input type="submit" style="display: none;" /></form>
+        
+    </section>
+    
+    <script type="text/javascript">
+        
+        window.socket = io.connect(window.location.toString());
+        
+        socket.on('id', function (data) {
+            window.myID = data;
+        });
+        
+        socket.on('msg', function (data) {
+            var div = document.getElementsByTagName('div')[0];
+            div.innerHTML += data + '<br />';
+            div.scrollTop = div.scrollHeight;
+        });
+        
+        function send(e) {
+            var inp = document.getElementById('text');
+            var div = document.getElementsByTagName('div')[0];
+            socket.emit('cmd', inp.value);
+            div.innerHTML += '<span style="opacity: 0.5;">' + inp.value + '</span><br />';
+            div.scrollTop = div.scrollHeight;
+            inp.value = '';
+            return false;
+        }
+        
+    </script>
+    
+</body>
+</html>

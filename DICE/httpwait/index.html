@@ -1,0 +1,53 @@
+<!DOCTYPE html5>
+<html>
+<head>
+    
+</head>
+<body>
+    
+    <script type="text/javascript">
+        
+        function loadURL (url, cb) {
+            
+            function handler() {
+                if(this.readyState == this.DONE) {
+                    cb && cb(this.responseText);
+                    cb = null;
+                }
+            }
+            
+            var client = new XMLHttpRequest();
+            client.onreadystatechange = handler;
+            client.open("GET", url);
+            client.send();
+            
+            setTimeout(function () {
+                cb && cb("(timeout)");
+                cb = null;
+                client.abort();
+            }, 300);
+            
+        };
+        
+        console.log("Start");
+        
+        loadURL("/url1", function (s) {
+            console.log(s);
+            loadURL("/url2", function (s) {
+                console.log(s);
+                loadURL("/url3", function (s) {
+                    console.log(s);
+                    loadURL("/url4", function (s) {
+                        console.log(s);
+                        loadURL("/url5", function (s) {
+                            console.log(s);
+                        });
+                    });
+                });
+            });
+        });
+        
+    </script>
+    
+</body>
+</html>
